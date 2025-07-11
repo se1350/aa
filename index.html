@@ -1,10 +1,12 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>pumpaa.dae Viewer</title>
-  <style>body { margin: 0; }</style>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+  </style>
 </head>
 <body>
   <script type="module">
@@ -14,6 +16,8 @@
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(3, 3, 3);
+
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
@@ -21,24 +25,24 @@
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
 
+    const loader = new ColladaLoader();
+    loader.load('pumpaa.dae', function (collada) {
+      const model = collada.scene;
+      model.scale.set(1, 1, 1);
+      scene.add(model);
+    });
+
     const light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(5, 5, 5);
     scene.add(light);
 
-    const loader = new ColladaLoader();
-    loader.load('pumpaa.dae', function (collada) {
-      const model = collada.scene;
-      scene.add(model);
-      animate();
-    });
-
-    camera.position.set(2, 2, 5);
-
-    function animate() {
+    const animate = function () {
       requestAnimationFrame(animate);
       controls.update();
       renderer.render(scene, camera);
-    }
+    };
+
+    animate();
 
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
